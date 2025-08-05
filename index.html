@@ -81,28 +81,43 @@
   </main>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.js"></script>
   <script>
-    function derivadaPasoLargo(fx, variable = 'x') {
-      return `📘 Paso 1: Se escribe la función original:  f(${variable}) = ${fx}
+    function detectarTipoFuncion(fx) {
+      if (/sin|cos|tan/.test(fx)) return "función trigonométrica";
+      if (/sqrt/.test(fx)) return "función raíz o irracional";
+      if (/\/.test(fx)) return "función racional";
+      if (/log|ln/.test(fx)) return "función logarítmica";
+      if (/e\^/.test(fx)) return "función exponencial";
+      if (/\^/.test(fx)) return "función polinómica";
+      return "función algebraica";
+    }
 
-📘 Paso 2: Aplicamos la REGLA DE LA POTENCIA (si aplica):
+    function derivadaPasoLargo(fx, variable = 'x') {
+      const tipo = detectarTipoFuncion(fx);
+      return `📘 Tipo de función: ${tipo.toUpperCase()}
+
+📘 Paso 1: Se define la función:
+  f(${variable}) = ${fx}
+  Esto indica que estamos trabajando con una ${tipo}.
+
+📘 Paso 2: Aplicamos la REGLA DE LA POTENCIA si es posible:
   Si f(${variable}) = ${variable}ⁿ, entonces f'(${variable}) = n·${variable}ⁿ⁻¹
 
-📘 Paso 3: Se escribe la fórmula del cociente incremental:
+📘 Paso 3: Escribimos la fórmula del cociente incremental:
   f'(${variable}) = lim(h→0) [f(${variable}+h) - f(${variable})] / h
 
-📘 Paso 4: Sustituimos la función original en f(${variable}+h):
-  ${fx.replaceAll(variable, `(${variable} + h)`)}
+📘 Paso 4: Sustituimos (x + h) en la función:
+  f(${variable}+h) = ${fx.replaceAll(variable, `(${variable} + h)`)}
 
-📘 Paso 5: Se arma la fracción del límite:
+📘 Paso 5: Formamos la fracción completa:
   [${fx.replaceAll(variable, `(${variable} + h)`)} - (${fx})] / h
 
-📘 Paso 6: Se desarrolla el numerador y se simplifica lo más posible.
+📘 Paso 6: Se desarrolla el numerador aplicando identidades y simplificaciones algebraicas.
 
-📘 Paso 7: Se cancela "h" si es posible y se toma el límite cuando h → 0.
+📘 Paso 7: Se factoriza si es necesario y se cancela h del denominador.
 
-📘 Paso 8: Resultado final de la derivada.
+📘 Paso 8: Aplicamos el límite cuando h → 0 para obtener la derivada final.
 
-✅ Derivada calculada: f'(${variable}) = ... (ver más abajo)`;
+✅ Resultado final: f'(${variable}) = ... (ver más abajo)`;
     }
 
     function resolverDerivada() {
@@ -128,6 +143,18 @@
         const ys1 = xs.map(x => f.evaluate({ x }));
         const ys2 = xs.map(x => math.evaluate(dfx, { x }));
 
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Ejes
+        ctx.beginPath();
+        ctx.strokeStyle = '#ccc';
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+
+        // f(x)
         ctx.beginPath();
         ctx.strokeStyle = '#ff1493';
         xs.forEach((x, i) => {
@@ -137,9 +164,9 @@
           else ctx.lineTo(px, py);
         });
         ctx.stroke();
-        ctx.font = '14px sans-serif';
-        ctx.fillText('🌷 Función original f(x)', 10, 20);
+        ctx.fillText('🌷 f(x)', 10, 20);
 
+        // f'(x)
         ctx.beginPath();
         ctx.strokeStyle = '#993366';
         xs.forEach((x, i) => {
@@ -149,7 +176,8 @@
           else ctx.lineTo(px, py);
         });
         ctx.stroke();
-        ctx.fillText('🌸 Derivada f\'(x)', 10, 40);
+        ctx.fillText('🌸 f\'(x)', 10, 40);
+
       } catch (error) {
         output.innerHTML = '<p style="color:red;">⚠️ Error: Verifica que la función esté bien escrita.</p>';
       }
