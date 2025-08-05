@@ -54,6 +54,16 @@
     }
     canvas {
       margin-top: 20px;
+      width: 100%;
+      max-width: 900px;
+      height: 600px;
+      border: 1px solid #ffb6c1;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      background-image: linear-gradient(to right, #eee 1px, transparent 1px),
+                        linear-gradient(to bottom, #eee 1px, transparent 1px);
+      background-size: 20px 20px;
     }
   </style>
 </head>
@@ -67,27 +77,32 @@
     <textarea id="funcion" placeholder="Ejemplo: x^2"></textarea>
     <button onclick="resolverDerivada()">Resolver</button>
     <div id="output"></div>
-    <canvas id="grafica" width="400" height="300"></canvas>
+    <canvas id="grafica" width="900" height="600"></canvas>
   </main>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.js"></script>
   <script>
     function derivadaPasoLargo(fx, variable = 'x') {
-      return `📘 Paso 1: Se escribe la fórmula del cociente incremental:
+      return `📘 Paso 1: Se escribe la función original:  f(${variable}) = ${fx}
+
+📘 Paso 2: Aplicamos la REGLA DE LA POTENCIA (si aplica):
+  Si f(${variable}) = ${variable}ⁿ, entonces f'(${variable}) = n·${variable}ⁿ⁻¹
+
+📘 Paso 3: Se escribe la fórmula del cociente incremental:
   f'(${variable}) = lim(h→0) [f(${variable}+h) - f(${variable})] / h
 
-📘 Paso 2: Se reemplaza f(${variable}) por la función que el usuario ingresó:
-  f(${variable}) = ${fx}
+📘 Paso 4: Sustituimos la función original en f(${variable}+h):
+  ${fx.replaceAll(variable, `(${variable} + h)`)}
 
-📘 Paso 3: Se desarrolla f(${variable}+h):
-  Sustituyendo en la función: ${fx.replaceAll(variable, `(${variable} + h)`)}
-
-📘 Paso 4: Se arma la fracción:
+📘 Paso 5: Se arma la fracción del límite:
   [${fx.replaceAll(variable, `(${variable} + h)`)} - (${fx})] / h
 
-📘 Paso 5: Se simplifica la expresión lo más posible.
-📘 Paso 6: Se aplica el límite cuando h tiende a 0 y se obtiene la derivada.
+📘 Paso 6: Se desarrolla el numerador y se simplifica lo más posible.
 
-✅ Resultado final: f'(${variable}) = ... (ver más abajo)`;
+📘 Paso 7: Se cancela "h" si es posible y se toma el límite cuando h → 0.
+
+📘 Paso 8: Resultado final de la derivada.
+
+✅ Derivada calculada: f'(${variable}) = ... (ver más abajo)`;
     }
 
     function resolverDerivada() {
@@ -109,7 +124,6 @@
         output.innerHTML = `<pre style="white-space: pre-wrap;">${explicacion}
 📌 Derivada final: f'(x) = ${dfx}</pre>`;
 
-        // Graficar función original y derivada
         const xs = math.range(-10, 10, 0.1).toArray();
         const ys1 = xs.map(x => f.evaluate({ x }));
         const ys2 = xs.map(x => math.evaluate(dfx, { x }));
@@ -124,7 +138,7 @@
         });
         ctx.stroke();
         ctx.font = '14px sans-serif';
-        ctx.fillText('🌷 Función original', 10, 15);
+        ctx.fillText('🌷 Función original f(x)', 10, 20);
 
         ctx.beginPath();
         ctx.strokeStyle = '#993366';
@@ -135,7 +149,7 @@
           else ctx.lineTo(px, py);
         });
         ctx.stroke();
-        ctx.fillText('🌸 Derivada', 10, 35);
+        ctx.fillText('🌸 Derivada f\'(x)', 10, 40);
       } catch (error) {
         output.innerHTML = '<p style="color:red;">⚠️ Error: Verifica que la función esté bien escrita.</p>';
       }
