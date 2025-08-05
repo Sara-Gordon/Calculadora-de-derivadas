@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Derivadas Paso a Paso ✨</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff0f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #ffc0cb;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #b30059;
+    }
+    main {
+      padding: 20px;
+    }
+    label, textarea, button {
+      display: block;
+      margin: 10px 0;
+    }
+    textarea {
+      width: 100%;
+      height: 50px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      background-color: #ffe6f0;
+      border: 2px dashed #ffb6c1;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Derivadas con el método largo 🧠✨</h1>
+    <p>Explicación paso a paso con gráfico 🌸</p>
+  </header>
+  <main>
+    <label for="funcion">Escribe tu función (ej. x^2, 1/x, sqrt(x), sin(x)):</label>
+    <textarea id="funcion" placeholder="Ejemplo: x^2"></textarea>
+    <button onclick="resolverDerivada()">Resolver</button>
+    <div id="output"></div>
+    <canvas id="grafica" width="400" height="300"></canvas>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.js"></script>
+  <script>
+    function derivadaPasoLargo(fx, variable = 'x') {
+      return `📘 Paso 1: Se escribe la fórmula del cociente incremental:
+  f'(${variable}) = lim(h→0) [f(${variable}+h) - f(${variable})] / h
+
+📘 Paso 2: Se reemplaza f(${variable}) por la función que el usuario ingresó:
+  f(${variable}) = ${fx}
+
+📘 Paso 3: Se desarrolla f(${variable}+h):
+  Sustituyendo en la función: ${fx.replaceAll(variable, `(${variable} + h)`)}
+
+📘 Paso 4: Se arma la fracción:
+  [${fx.replaceAll(variable, `(${variable} + h)`)} - (${fx})] / h
+
+📘 Paso 5: Se simplifica la expresión lo más posible.
+📘 Paso 6: Se aplica el límite cuando h tiende a 0 y se obtiene la derivada.
+
+✅ Resultado final: f'(${variable}) = ... (ver más abajo)`;
+    }
+
+    function resolverDerivada() {
+      const fx = document.getElementById('funcion').value;
+      const output = document.getElementById('output');
+      const canvas = document.getElementById('grafica');
+      const ctx = canvas.getContext('2d');
+
+      output.innerHTML = '';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      try {
+        const parsed = math.parse(fx);
+        const f = parsed.compile();
+        const dfx = math.derivative(fx, 'x').toString();
+
+        const explicacion = derivadaPasoLargo(fx);
+
+        output.innerHTML = `<pre style="white-space: pre-wrap;">${explicacion}
+📌 Derivada final: f'(x) = ${dfx}</pre>`;
+
+        // Graficar función original y derivada
+        const xs = math.range(-10, 10, 0.1).toArray();
+        const ys1 = xs.map(x => f.evaluate({ x }));
+        const ys2 = xs.map(x => math.evaluate(dfx, { x }));
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#ff1493';
+        xs.forEach((x, i) => {
+          const px = canvas.width / 2 + x * 20;
+          const py = canvas.height / 2 - ys1[i] * 20;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+        ctx.font = '14px sans-serif';
+        ctx.fillText('🌷 Función original', 10, 15);
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#993366';
+        xs.forEach((x, i) => {
+          const px = canvas.width / 2 + x * 20;
+          const py = canvas.height / 2 - ys2[i] * 20;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+        ctx.fillText('🌸 Derivada', 10, 35);
+      } catch (error) {
+        output.innerHTML = '<p style="color:red;">⚠️ Error: Verifica que la función esté bien escrita.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
